@@ -7,7 +7,7 @@
 * Process - 특정 방법으로 데이터를 가공
 * Write - 데이터를 수정된 양식으로 다시 저장
 
-## 배티 아키텍처
+## 배치 아키텍처
 
 ### Application
 * 개발자가 만든 모든 Job과 커스텀 코드
@@ -255,3 +255,4 @@ CREATE TABLE BATCH_JOB_SEQ (
 INSERT INTO BATCH_JOB_SEQ (ID, UNIQUE_KEY) select * from (select 0 as ID, '0' as UNIQUE_KEY) as tmp where not exists(select * from BATCH_JOB_SEQ);
 
 ```
+
