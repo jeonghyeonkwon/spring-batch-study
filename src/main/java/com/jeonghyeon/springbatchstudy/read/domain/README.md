@@ -34,3 +34,11 @@
   * JobParameter 검증기
 * SimpleStepHandler
   * Step 실행 핸들러
+
+## JobInstance
+* BATCH_JOB_INSTANCE라는 테이블에 생성됨
+* Job과 JobParameter로 JobInstance가 없다면 생성
+  * 있다면 있는 JobInstance를 반환
+* 판별 기준은 JobName + JobKey(JobParameter 해시값)으로 판단
+  * JobName = 일별정산, JobParamter = 2022.10.14
+  
