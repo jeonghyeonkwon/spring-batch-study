@@ -2,6 +2,7 @@ package com.jeonghyeon.springbatchstudy;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -11,6 +12,8 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.Map;
 
 @Configuration
 @RequiredArgsConstructor
@@ -33,6 +36,8 @@ public class JobConfiguration {
                 .tasklet(new Tasklet() {
                     @Override
                     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+
+
                         System.out.println("step1 was executed");
                         return RepeatStatus.FINISHED;
                     }
@@ -44,6 +49,12 @@ public class JobConfiguration {
                 .tasklet(new Tasklet() {
                     @Override
                     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+
+                        JobParameters jobParameters = contribution.getStepExecution().getJobExecution().getJobParameters();
+                        // String value 꺼내기
+                        String parameterKey = jobParameters.getString("parameterKey");
+                        // Map 형식으로 받기
+                        Map<String, Object> jobParameters1 = chunkContext.getStepContext().getJobParameters();
                         System.out.println("step1 was executed");
                         return RepeatStatus.FINISHED;
                     }
