@@ -79,3 +79,11 @@ public Step step1() {
             }).build();
 }
 ```
+
+## JobExecution
+* BATCH_JOB_EXECUTION 테이블에 생성됨
+* JobInstance에 대한 한번의 시도를 의미하는 객체, Job 실행 중에 발생한 정보들을 저장하고 있는 객체
+  * 시작시간, 종료시간, 상태(시작됨, 완료, 실패), 종료 상태의 속성을 가짐
+* 실행 상태 결과가 COMPLETE면 재 실행 불가(완료된 것으로 판단)
+  * FAILED면 완료되지 않은 것이므로 재실행 가능
+* BATCH_JOB_INSTANCE와 BATCH_JOB_EXECUTION 테이블은 1:N 관계
