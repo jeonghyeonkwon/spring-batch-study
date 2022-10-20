@@ -17,7 +17,7 @@
 
 ### JOB 구조
 #### Job - interface
-* void execute(JobExecution) 
+* void execute(JobExecution jobExecution) 
   * Job 실행 메서드
 #### AbstractJob - abstract class
 * name
@@ -87,3 +87,67 @@ public Step step1() {
 * 실행 상태 결과가 COMPLETE면 재 실행 불가(완료된 것으로 판단)
   * FAILED면 완료되지 않은 것이므로 재실행 가능
 * BATCH_JOB_INSTANCE와 BATCH_JOB_EXECUTION 테이블은 1:N 관계
+
+
+## Step
+* 독립적인 하나의 단계 실제 배치 처리를 컨트롤 하는데 필요한 모든 정보를 가지고 있는 도메인 객체
+
+### Step - Interface
+* void execution(StepExecution stepExecution);
+  * Step을 실행시키는 execution 메소드
+  * 실행 결과 상태는 StepExecution에 저장
+### AbstractStep - abstract class
+* name
+  * Step 이름
+* startLimit
+  * Step 실행 제한 횟수
+* allowStartIfComplete
+  * Step 실행이 완료된 후 재 실행 여부
+* stepExecutionListener
+  * Step 이벤트 리스터
+* jobRepository
+  * Step 메타데이터 저장소
+### Step 기본 구현체
+* TaskletStep
+  * 가장 기본이 되는 클래스, Tasklet 타입의 구현체들을 제어
+```java
+// 직접 생성한 Tasklet
+public Step taskletStep(){
+    return this.stepBuilderFactory.get("step")
+        .tasklet(myTasklet())
+        .build();
+}
+
+// ChunkOrientedTasklet을 실행
+public Step taskletStep(){
+    return this.stepBuilderFactory.get("step")
+        .<Member,Member> chunk(100)
+        .reader(reader())
+        .writer(writer())
+        .build();
+}
+
+```
+
+* PartitionStep
+  * 멀티 스레드 방식 Step을 여러개로 분리해서 실행
+* JobStep
+  * Step 내에서 Job을 실행
+```java
+public Step jobStep(){
+    return this.stepBuilderFactory.get("step")
+        .launcher(jobLauncher)
+        .parametersExtractor(jobParametersExtractor())
+        .build();
+}
+
+```
+* FlowStep
+  * Step 내에서 Flow를 실행하도록 한다.
+```java
+public Step flowStep(){
+    return this.stepBuilderFactory.get("step")
+        .flow(myFlow())
+        .build();
+}
+```
