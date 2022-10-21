@@ -19,6 +19,7 @@
 #### Job - interface
 * void execute(JobExecution jobExecution) 
   * Job 실행 메서드
+
 #### AbstractJob - abstract class
 * name
   * Job 이름
@@ -151,3 +152,17 @@ public Step flowStep(){
         .build();
 }
 ```
+
+
+## StepExecution
+* BATCH_STEP_EXECUTION 테이블에 생성됨
+* Step에 대한 한번의 시도를 의미하는 객체로서 Step 실행 중에 발생한 정보들을 저장하고 있는 객체
+  * 시작시간, 종료시간, 상태(시작됨, 완료, 실패), commit count, rollback, count등의 속성을 가짐
+* Step 이 매번 시도될 때마다 생성되며 각 Step 별로 생성된다.
+  * 완료된 것은 실행 안함, 실패한 것만 재실행 됨
+* 이전 단계 Step이 실패해서 현재 Step을 실행하지 않았다면 StepExecution을 실행하지 않는다. Step이 시작됐을 때만 StepExecution을 생성
+
+### JobExecution과의 관계
+* Step의 StepExecution이 모두 정상적으로 완료 되어야 JobExecution이 정상적으로 완료
+* Step의 StepExecution 중 하나라도 실패하면 JobExecution은 실패
+* StepExecution(N) : JobExecution(1) 
