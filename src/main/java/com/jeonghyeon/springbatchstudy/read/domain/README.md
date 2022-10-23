@@ -172,3 +172,34 @@ public Step flowStep(){
 * 청크 프로세스의 변경 사항을 버퍼링 한 후 StepExecution 상태를 업데이트 하는 도메인 객체
 * 청크 커밋 직전에 StepExecution의 apply 메서드를 호출하여 상태를 업데이트
 * ExitStatus의 기본 종료코드 외 사용자 정의 종료코드를 생성해서 적용 할 수 있음
+
+
+## ExecutionContext
+* DB에 직렬화된 한 값으로 저장
+* 공유 범위
+  * Step - StepExecution에 저장 각 Step끼리 공유 안됨
+    * BATCH_STEP_EXECUTION_CONTEXT에 직렬화
+  * Job - JobExecution에 저장 각 Job끼리 공유 안됨, Job과 그 안의 Step끼리 공유 가능
+    * BATCH_JOB_EXECUTION_CONTEXT에 직렬화
+
+```java
+import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.item.ExecutionContext;
+import org.springframework.batch.repeat.RepeatStatus;
+
+class ExecutionContextTasklet implements Tasklet {
+  @Override
+  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+    //Contribute에서 꺼내기
+    ExecutionContext jobExecution = contribution.getStepExecution().getJobExecution().getExecutionContext();
+    ExecutionContext stepExecution = contribution.getStepExecution().getExecutionContext();
+
+    // ChunkContext에서 이름 꺼내기
+    String jobName = chunkContext.getStepContext().getStepExecution().getJobExecution().getJobInstance().getJobName();
+    String stepName = chunkContext.getStepContext().getStepExecution().getStepName();
+
+  }
+}
+```
