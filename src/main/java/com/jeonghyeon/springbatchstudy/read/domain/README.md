@@ -203,3 +203,69 @@ class ExecutionContextTasklet implements Tasklet {
   }
 }
 ```
+
+
+## JobRepository
+* 커스터 마이징 방법
+  * JDBC - JobRepositoryFactoryBean
+  * In Memory - MapJobRepositoryFactoryBean
+    * 테스트 용, 프로토 타입 용으로
+
+```java
+
+@Configuration
+public class CustomBatchConfigurer extends BasicBatchConfigurer {
+    private final DataSource dataSource;
+    /**
+     * Create a new {@link BasicBatchConfigurer} instance.
+     *
+     * @param properties                    the batch properties
+     * @param dataSource                    the underlying data source
+     * @param transactionManagerCustomizers transaction manager customizers (or
+     *                                      {@code null})
+     */
+    protected CustomBatchConfigurer(BatchProperties properties, DataSource dataSource, TransactionManagerCustomizers transactionManagerCustomizers) {
+        super(properties, dataSource, transactionManagerCustomizers);
+        this.dataSource = dataSource;
+    }
+
+    @Override
+    protected JobRepository createJobRepository() throws Exception {
+        JobRepositoryFactoryBean jobRepositoryFactoryBean = new JobRepositoryFactoryBean();
+        jobRepositoryFactoryBean.setDataSource(dataSource);
+        jobRepositoryFactoryBean.setTransactionManager(getTransactionManager());
+        jobRepositoryFactoryBean.setIsolationLevelForCreate("ISOLATION_READ_COMMITEED");
+        jobRepositoryFactoryBean.setTablePrefix("SYSTEM_");
+        return jobRepositoryFactoryBean.getObject();
+    }
+}
+
+
+
+```
+
+```java
+
+@Component
+public class JobRepositoryListener implements JobExecutionListener {
+  @Autowired
+  private JobRepository jobRepository;
+  @Override
+  public void beforeJob(JobExecution jobExecution) {
+
+  }
+
+  @Override
+  public void afterJob(JobExecution jobExecution) {
+    String jobName = jobExecution.getJobInstance().getJobName();
+
+    JobParameters jobParameters = new JobParametersBuilder().addString("requestDate", "20221024").toJobParameters();
+
+    /*
+     * getLastJobExecution : 맨 마지막으로 저장된 JobExecution을 가져올 수 있다.
+     * */
+
+    JobExecution lastJobExecution = jobRepository.getLastJobExecution(jobName, jobParameters);
+  }
+}
+```
