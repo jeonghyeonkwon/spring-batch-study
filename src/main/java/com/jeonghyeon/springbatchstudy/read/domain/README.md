@@ -269,3 +269,43 @@ public class JobRepositoryListener implements JobExecutionListener {
   }
 }
 ```
+
+
+## JobLauncher
+* 배치 Job 실행 역할
+* 동기적 실행
+  * taskExecutor를 SyncTaskExecutor로 설정할 경우 (기본값은 SyncTaskExecutor)
+  * JobExecute을 획득하고, 배치 처리를 최종 완료한 이후 Client에게 JobExecution을 반환
+  * 스케줄러에 의한 배치 처리에 적합 함 - 배치 처리 시간이 길어도 상관없는 경우
+* 비동기적 실행
+  * taskExecutor가 SimpleAsyncTaskExecutor로 설정할 경우
+  * JobExecution을 획득한 후 Client에게 바로 JobExecution을 반환하고 배치처리를 완료
+  * Http 요청에 의한 배치처리에 적합함 - 배치 처리 시간이 길 경우 응답이 늦어지지 않도록 함
+```java
+@RestController
+public class JobLauncherController {
+    @Autowired
+    private Job job;
+    
+    @Autowired
+    private JobLauncher jobLauncher;
+    
+    @Autowired
+    private BasicBatchConfigurer basicBatchConfigurer;
+    
+    @PostMapping("/batch")
+    public String launch(@RequestBody Member member) throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
+        JobParameters jobParameters = new JobParametersBuilder().addString("id", member.getId()).addDate("date", new Date()).toJobParameters();
+        jobLauncher.run(job,jobParameters);
+        
+        // 비동기적 실행을 할려면
+        SimpleJobLauncher simpleJobLauncher = (SimpleJobLauncher) basicBatchConfigurer.getJobLauncher();
+        simpleJobLauncher.setTaskExecutor(new SimpleAsyncTaskExecutor());
+        simpleJobLauncher.run(job,jobParameters);
+        //
+        
+        return "batch compeleted";
+    }
+}
+
+```
