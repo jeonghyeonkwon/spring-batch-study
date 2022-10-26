@@ -1,4 +1,4 @@
-package com.jeonghyeon.springbatchstudy;
+package com.jeonghyeon.springbatchstudy.aboutdomain;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
@@ -15,8 +15,8 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.Map;
 
-@Configuration
-@RequiredArgsConstructor
+//@Configuration
+//@RequiredArgsConstructor
 public class JobConfiguration {
     private final JobBuilderFactory jobBuilderFactory;
 
