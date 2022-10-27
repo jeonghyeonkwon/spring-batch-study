@@ -17,13 +17,13 @@ public class JobConfiguration {
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
 
-    @Bean
-    public Job batchJob1(){
-        return this.jobBuilderFactory.get("batchJob1")
-                .start(step1())
-                .next(step2())
-                .build();
-    }
+//    @Bean
+//    public Job batchJob1(){
+//        return this.jobBuilderFactory.get("batchJob1")
+//                .start(step1())
+//                .next(step2())
+//                .build();
+//    }
 
     private Step step2() {
         return stepBuilderFactory.get("step2").tasklet((contribution, chunkContext) -> {
