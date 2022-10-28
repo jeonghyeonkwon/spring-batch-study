@@ -43,3 +43,29 @@ jobBuilderFactory.get("batchJob") // JobBuilder를 생성하는 팩토리, Job�
         .listener(JobExecutionListener)    // Job 라이프 사이클의 특정 시점에 콜백 제공 받도록 JobExecutionListener 설정
         .build();   // SimpleJob 생성
 ```
+
+### validator()
+* Job 실행에 꼭 필요한 파라미터를 검증하는 용도
+* DefaultJobParametersValidator 구현체를 지원, 좀 더 복잡한 제약 조건이 잇다면 인터페이스를 직접 구현할 수도 있음
+  * DefaultJobParametersValidator
+    * 필수키와 옵션키가 있고 필수키가 없으면 검증 예외를 반환
+```java
+public class CustomJobParametersValidator implements JobParametersValidator {
+    @Override
+    public void validate(JobParameters parameters) throws JobParametersInvalidException {
+        if(parameters.getString("name")==null){
+            throw new JobParametersInvalidException("name parameters is not found");
+        }
+    }
+}
+
+// 설정에서
+  @Bean
+  public Job batchJob1(){
+    return this.jobBuilderFactory.get("batchJob1")
+            .start(step1())
+            .next(step2())
+            .validator(new CustomJobParametersValidator())
+            .build();
+  }
+```

@@ -17,13 +17,14 @@ public class JobConfiguration {
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
 
-//    @Bean
-//    public Job batchJob1(){
-//        return this.jobBuilderFactory.get("batchJob1")
-//                .start(step1())
-//                .next(step2())
-//                .build();
-//    }
+    @Bean
+    public Job batchJob1(){
+        return this.jobBuilderFactory.get("batchJob1")
+                .start(step1())
+                .next(step2())
+                .validator(new CustomJobParametersValidator())
+                .build();
+    }
 
     private Step step2() {
         return stepBuilderFactory.get("step2").tasklet((contribution, chunkContext) -> {
@@ -38,15 +39,15 @@ public class JobConfiguration {
             return RepeatStatus.FINISHED;
         })).build();
     }
-
-    @Bean
-    public Job batchJob2(){
-        return this.jobBuilderFactory.get("batchJob")
-                .start(flow())
-                .next(step5())
-                .end()
-                .build();
-    }
+//
+//    @Bean
+//    public Job batchJob2(){
+//        return this.jobBuilderFactory.get("batchJob")
+//                .start(flow())
+//                .next(step5())
+//                .end()
+//                .build();
+//    }
 
     private Step step5() {
         return stepBuilderFactory.get("step5").tasklet(((contribution, chunkContext) -> {
