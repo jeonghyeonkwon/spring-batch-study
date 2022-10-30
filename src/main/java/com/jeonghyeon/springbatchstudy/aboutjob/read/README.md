@@ -69,3 +69,16 @@ public class CustomJobParametersValidator implements JobParametersValidator {
             .build();
   }
 ```
+
+### preventRestart()
+* Job 재 시작 여부 설정
+* 원래는 실패해도 재 시작 가능 하지만 false로 설정하면 실패해도 다시 시작 못함 (기본값 true)
+```java
+jobBuilderFactory.get("batchJob") // JobBuilder를 생성하는 팩토리, Job의 이름을 매개변수로 받음
+        .start(Step)    // 처음 실행 할 Step 설정, 최초 한번 설정, 이 메서드를 실행하면 SimpleJobBuilder 반환
+        .next(Step)     // 다음 실행 할 Step 설정
+        // !!!!!!!
+        .preventRestart(true)   // Job의 재시작 가능 여부, 기본 true
+        
+        .build();   // SimpleJob 생성
+```
