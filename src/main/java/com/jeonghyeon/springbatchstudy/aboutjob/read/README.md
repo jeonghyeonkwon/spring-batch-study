@@ -82,3 +82,27 @@ jobBuilderFactory.get("batchJob") // JobBuilder를 생성하는 팩토리, Job�
         
         .build();   // SimpleJob 생성
 ```
+### increment()
+* JobParameter가 같으면 재 시작 불가능함 그래서 기존의 JobParameter 변경 없이 Job을 여러 번 시작하고자 할 때
+* RunIdIncrementer 구현체를 지원하며 인터페이스를 직접 구현할 수 있음
+```java
+
+
+
+public class CustomJobParameterIncrementer implements JobParametersIncrementer {
+    static final SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd-hhmmss");
+    @Override
+    public JobParameters getNext(JobParameters parameters) {
+        String id = format.format(new Date());
+        return new JobParametersBuilder().addString("run.id",id).toJobParameters();
+    }
+}
+
+jobBuilderFactory.get("batchJob") // JobBuilder를 생성하는 팩토리, Job의 이름을 매개변수로 받음
+        .start(Step)    // 처음 실행 할 Step 설정, 최초 한번 설정, 이 메서드를 실행하면 SimpleJobBuilder 반환
+        .next(Step)     // 다음 실행 할 Step 설정
+        .incrementer(new CustomJobParameterIncrementer()) // JobParameter의 값을 자동으로 증가해 주는 JobParametersIncrementer 설정
+        
+        .build();   // SimpleJob 생성
+
+```
