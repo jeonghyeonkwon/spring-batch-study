@@ -36,12 +36,12 @@ public Step batchStep(){
    * JobStepBuilder
    * FlowStepBuilder
 
-### TaskletStep
+## TaskletStep
 * 스프링 배치에서 제공하는 Step 구현체로서 Tasket을 실행시키는 도메인 객체
 * ReapeatTemplate를 사용해서 Tasklet의 구문을 트랜잭션 경계 내에서 반복해서 실행
 * Task 기반과 Chunk 기반으로 나누어서 Tasklet을 실행
 
-#### Task VS Chunk 기반 비교 (Step의 실행 단위 2가지)
+### Task VS Chunk 기반 비교 (Step의 실행 단위 2가지)
 * Task 기반
   * ItemReader 와 ItemWriter와 같은 청크 기반의 작업보다 단일 작업 기반으로 처리 되는 것이 더 효율적
   * 주로 Tasklet 구현체를 만들어 사용
@@ -69,3 +69,30 @@ public Step step(){
         .reader().writer().build();
 }
 ```
+
+### tasklet()
+* Tasklet 타입의 클래스 정의
+  * Tasklet
+    * Step 내에서 구성되고 실행되는 도메인 객체로서 주로 단일 테스크를 수행하기 위한 것
+    * TaskletStep에 의해 반복적으로 수행되며 반환값에 따라 계속 수행 혹은 종료한다
+    * RepeatStatus - Tasklet의 반복 여부 상태값
+      * RepeatStatus.FINISHED - Tasklet 종료, return 을 null로 반환한 것과 동일
+      * RepeatStatus.CONTINUABLE - Tasklet 반복
+  * 이 메소드가 실행되면 TaskletStepBuilder가 반환
+  * Step에 오직 하나의 Tasklet 설정이 가능하다
+  * 익명 클래스 보다 구현해서 사용하는 것이 낫다
+```java
+public class CustomTasklet implements Tasklet {
+    @Override
+    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+        contribution.getStepExecution().getStepName();
+        chunkContext.getStepContext().getJobName();
+        return RepeatStatus.FINISHED;
+    }
+}
+``` 
+#### 구조
+```java
+RepeatStatus execute(StepContribution, ChunkContext);
+```
+
