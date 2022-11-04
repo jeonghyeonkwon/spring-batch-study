@@ -90,9 +90,28 @@ public class CustomTasklet implements Tasklet {
         return RepeatStatus.FINISHED;
     }
 }
-``` 
+
+```
 #### 구조
 ```java
 RepeatStatus execute(StepContribution, ChunkContext);
 ```
 
+
+### startLimit()
+* step 실행 횟수를 조정
+* Step 마다 설정할 수 있다
+* 초과하면 예외 발생(StartLimitExceededException 발생)
+* start-limit의 기본은 Integer.MAX_VALUE
+### allowStartIfComplete(Boolean)
+* 재시작 가능한 job에서 Step의 이전 성공 여부와 상관없이 항상 step을 실행하기 위한 설정
+* 실행 마다 유효성 검증하는 Step이나 사전 작업이 꼭 필요한 Step
+```java
+public Step step(){
+    return this.stepBuilderFactory.get("step")
+        .tasklet(myTasklet())
+        .startLimit(10)
+        .allowStartIfComplete(true)
+        .build();
+}
+```
