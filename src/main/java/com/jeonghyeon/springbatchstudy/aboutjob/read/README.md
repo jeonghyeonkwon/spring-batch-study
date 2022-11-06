@@ -106,3 +106,60 @@ jobBuilderFactory.get("batchJob") // JobBuilder를 생성하는 팩토리, Job�
         .build();   // SimpleJob 생성
 
 ```
+### 실습
+```java
+ @Bean
+public Job parentJob(){
+    return this.jobBuilderFactory.get("parentJob")
+            .start(jobStep(null))
+            .next(step2())
+            .build();
+}
+
+@Bean
+public Step jobStep(JobLauncher jobLauncher){
+    return stepBuilderFactory.get("jobStep")
+            .job(childJob())
+            .launcher(jobLauncher)
+            .parametersExtractor(jobParametersExtractor())
+            .listener(new StepExecutionListener() {
+                @Override
+                public void beforeStep(StepExecution stepExecution) {
+                    stepExecution.getExecutionContext().putString("name","user1");
+                }
+
+                @Override
+                public ExitStatus afterStep(StepExecution stepExecution) {
+                    return null;
+                }
+            })
+            .build();
+}
+
+private DefaultJobParametersExtractor jobParametersExtractor() {
+    DefaultJobParametersExtractor extractor = new DefaultJobParametersExtractor();
+    extractor.setKeys(new String[] {"name"});
+    return extractor;
+}
+
+@Bean
+public Job childJob(){
+    return jobBuilderFactory.get("childJob")
+            .start(step1())
+            .build();
+}
+@Bean
+public Step step1() {
+    return stepBuilderFactory.get("step1").tasklet(((contribution, chunkContext) -> {
+        System.out.println("step1 has executed");
+        return RepeatStatus.FINISHED;
+    })).build();
+}
+@Bean
+public Step step2() {
+    return stepBuilderFactory.get("step2").tasklet((contribution, chunkContext) -> {
+        System.out.println("step2 has executed");
+        return RepeatStatus.FINISHED;
+    }).build();
+}
+```

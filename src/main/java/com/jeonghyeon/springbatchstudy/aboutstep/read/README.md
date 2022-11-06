@@ -115,3 +115,19 @@ public Step step(){
         .build();
 }
 ```
+
+## JobStep
+* Job 안에 Step인데 그 Step이 외부의 Job을 포함하고 있는것
+  * Job1 -> Step -> Job2 이런 식
+* 외부 Job이 실패하면 해당 Step이 실패하므로 최종 Job은 실패
+* 커다란 시스템을 작은 모듈로 쪼개고 job의 흐름을 관리할 때 사용
+* StepBuilderFactory > StepBuilder > JobStepBuilder > JobStep
+```java
+public Step jobStep(){
+    return stepBuilderFactory.get("jobStep") // StepBuilder를 생성하는 팩토리, Step의 이름을 매개변수로 받음
+        .job(Job)   // JobStep내 에서 실행 될 Job 설정, JobStepBuilder 반환
+        .launcher(JobLauncher)  // Job을 실행할 JobLauncher설정
+        .parametersExtractor(JobParametersExtractor)    // Step의 ExecutionContext를 Job이 실행되는 데 필요한 JobParameters로 변환
+        .build();   // JobStep을 생성
+}
+```
