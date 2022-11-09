@@ -23,5 +23,13 @@ public Job batchJob(){
 * Flow와 Job의 흐름을 구성하는데만 관여하고 실제 비즈니스 로직은 Step에서 이루어진다
 * 내부적으로 SimpleFlow 객체를 포함하고 있으며 Job 실행 시 호출한다
 
+
 ## 순서
 * JobBuilderFactory > JobBuilder > JobFlowBuilder > FlowBuilder > FlowJob
+
+### start() / next()
+* start()
+  * 파라미터로 Flow로 받으면 JobFlowBuilder로 반환
+  * 파라미터로 Step로 받으면 SimpleJobBuilder로 반환
+* next()
+  * Step, Flow, JobExcutionDecider가 올 수 있다.
