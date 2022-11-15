@@ -33,3 +33,28 @@ public Job batchJob(){
   * 파라미터로 Step로 받으면 SimpleJobBuilder로 반환
 * next()
   * Step, Flow, JobExcutionDecider가 올 수 있다.
+
+## Transition
+### BatchStatus
+* JobExecution과 StepExecution의 속성으로 Job과 Step의 종료 후 최종 상태
+* SimpleJob
+  * 마지막 Step의 값을 최종 Step값으로 반영
+  * Step이 실패할 경우 해당 Step이 마지막 Step이 된다
+* FlowJob
+  * Flow내 Step의 ExitStatus 값을 FlowExecutionStatus 값으로 저장
+  * 마지막 Flow의 FlowExecutionStatus 값을 Job의 최종 BatchStatus 값으로 반영
+* COMPLETED, STARTING, STARTED, STOPPING, STOPPED, FAILED, ABANDONED, UNKOWN 의 열거 타입이 있다
+  * ABANDONED는 처리는 완료했지만 성공하지 못한 단계 재시작 안하고 건너뜀
+### ExitStatus
+* JobExecution과 StepExecution의 속성으로 Job과 Step의 실행 후 어떤 상태로 종료 되었는지 정의
+* 기본은 BatchStatus와 ExitStatus는 동일
+* SimpleJob
+  * 마지막 Step의 ExitStatus 값을 Job의 최종 ExitStatus 값으로 반열
+* FlowJob
+  * Flow 내 Step의 ExitStatus 값을 FlowExecutionStatus 값으로 저장
+  * 마지막 flow의 FlowExecutionStatus 값을 Job의 최종 ExitStatus 값으로 반영
+* UNKNOWN, EXECUTING, COMPLETED, NOOP, FAILED, STOPPED
+
+#### FlowExecutionStatus
+* FlowExecution의 속성으로 Flow의 실행 후 최종 결과 상태가 무엇인지 정의
+* COMPLETED, STOPPED, FAILED, UNKNOWN
